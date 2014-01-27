@@ -1,0 +1,131 @@
+# Makefile for Dingoo A320 (MIPS cpu)
+# Initially for native SDK from http://code.google.com/p/dingoo-sdk/ with SDL
+# Creates both a .APP file for debug testing, and a SIM for launching
+#
+#
+#   make -f Makefile.dingoo
+#   make -B -f Makefile.dingoo  # Force rebuild all
+#
+
+# Define the applications properties here:
+
+APP_NAME = gnuboy_dingoo
+
+
+
+# Define the compiler settings here:
+
+CPP       = mipsel-linux-g++
+CC        = mipsel-linux-gcc
+LD        = mipsel-linux-ld
+
+#SOURCE    = .
+
+INCLUDE   = -I${DINGOO_SDK}/include -I${DINGOO_SDK}/include/zlib -I${DINGOO_SDK}/include/SDL -I../lib -I${MIPSTOOLS}/mipsel-linux/include -I./ -I$
+
+W_OPTS    = -Wall -Wextra -finline-functions -fomit-frame-pointer -msoft-float -fno-builtin -fno-exceptions
+CPP_OPTS  = -G0 -O3 $(INCLUDE) -mips32 -mno-abicalls -fno-pic $(W_OPTS) -D_DEBUG -DMPU_JZ4740 -c
+CC_OPTS   = -G0 -O3 $(INCLUDE) -mips32 -mno-abicalls -fno-pic $(W_OPTS) -D_DEBUG -DMPU_JZ4740 -c
+CC_OPTS   += -DNDEBUG=1  ## allow assert() calls to be removed, if left fails to build with Dingoo native
+CC_OPTS   += -DIS_LITTLE_ENDIAN
+CC_OPTS   += -DDINGOO_BUILD -DDINGOO_NATIVE
+CC_OPTS   += -DGNUBOY_USE_BINARY_RTC_FILES -DGNUBOY_DISABLE_DEBUG_DISASSEMBLE
+CC_OPTS   += -DDINGOO_DIE_LOG_TO_FILE
+CC_OPTS   += -DGNUBOY_NO_PRINTF  ## dingoo does have printf BUT it goes to the serial port (well contact pads where you can solder a serial port/line).
+CC_OPTS_A = $(CC_OPTS) -D_ASSEMBLER_
+
+# Note disabling sound seems to freeze up Dingoo version (win32 is fine) :-(
+#DISABLE_SOUND = true
+ifdef DISABLE_SOUND
+	CC_OPTS += -DGNUBOY_DISABLE_SDL_SOUND
+	SND_SRC_C = sys/dummy/nosound.o
+endif
+
+
+LIB_PATH  = ${DINGOO_SDK}/lib
+LIBS      =  -lSDL -lsml -lc -ljz4740 -lgcc
+
+LD_SCRIPT = ${DINGOO_SDK}/lib/dingoo.xn
+LD_OPTS   = -nodefaultlibs --script $(LD_SCRIPT) -L$(LIB_PATH) $(LIBS) -o $(APP_NAME).elf
+
+
+
+# Find all source files
+
+#SRC_CPP = $(foreach dir, $(SOURCE), $(wildcard $(dir)/*.cpp))
+#SRC_C   = $(foreach dir, $(SOURCE), $(wildcard $(dir)/*.c))
+#SRC_S   = $(foreach dir, $(SOURCE), $(wildcard $(dir)/*.S))
+SRC_CPP = $(foreach dir, $(SOURCE), $(wildcard $(dir)/*.cpp))
+SRC_C   = lcd.c refresh.c lcdc.c palette.c cpu.c mem.c rtc.c hw.c sound.c
+SRC_C  += events.c keytable.c loader.c save.c debug.c emu.c
+SRC_C  += rccmds.c rckeys.c rcvars.c rcfile.c exports.c split.c inflate.c
+# path.c 
+SRC_C  += sys/sdl/sdl.c sys/sdl/keymap.c sys/sdl/SFont.c $(SND_SRC_C)
+SRC_C  += sys/dingoo/a320.c sys/dingoo/main.c
+
+
+## Requirements for (optional) .zip support
+## Disable with GNUBOY_USE_MINIZIP defined
+SRC_C   += unzip/unzip.c unzip/ioapi.c
+LIBS    += -lz
+CC_OPTS += -DUSE_FILE32API
+
+BUILD_DINGOO_SIM = $(APP_NAME).sim
+ifdef BUILD_DINGOO_SIM
+	CC_OPTS   += -DBUILD_DINGOO_SIM
+	SRC_C  += sys/dingoo/sim.c
+endif
+
+USE_SDL_TIMERS = true
+ifdef USE_SDL_TIMERS
+	CC_OPTS   += -DGNUBOY_USE_SDL_TIMERS
+else
+	SRC_C  += sys/dingoo/native.c
+endif
+
+## Use of SDL means that sound is provided as is the joystick so can not use nosound unless #ifdef SDL code....
+## sys/dummy/nosound.c sys/dummy/nojoy.c
+SRC_S   = $(foreach dir, $(SOURCE), $(wildcard $(dir)/*.S))
+OBJ_CPP = $(patsubst %.cpp, %.o, $(SRC_CPP))
+OBJ_C   = $(patsubst %.c, %.o, $(SRC_C))
+OBJ_S   = $(patsubst %.S, %.o, $(SRC_S))
+OBJ     = $(OBJ_CPP) $(OBJ_C) $(OBJ_S)
+
+
+
+# Compile rules.
+
+.PHONY : all
+
+
+
+all : $(APP_NAME).app $(BUILD_DINGOO_SIM)
+
+$(APP_NAME).app : $(APP_NAME).elf
+	${DINGOO_SDK}/tools/elf2app/elf2app $(APP_NAME)
+
+ifdef BUILD_DINGOO_SIM
+$(APP_NAME).sim: $(APP_NAME).app
+	mv $(APP_NAME).app $(APP_NAME).sim
+endif
+
+$(APP_NAME).elf : $(OBJ)
+	$(LD) $(OBJ) $(LD_OPTS)
+
+$(OBJ_CPP) : %.o : %.cpp
+	$(CPP) $(CPP_OPTS) -o $@ $<
+
+$(OBJ_C) : %.o : %.c
+	$(CC) $(CC_OPTS) -o $@ $<
+
+$(OBJ_S) : %.o : %.S
+	$(CC) $(CC_OPTS_A) -o $@ $<
+
+
+
+# Clean rules
+
+.PHONY : clean
+
+clean :
+	rm -f $(OBJ) $(APP_NAME).elf $(APP_NAME).bin $(APP_NAME).app $(APP_NAME).sim

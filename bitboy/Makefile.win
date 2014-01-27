@@ -1,0 +1,57 @@
+# 
+#   make -f Makefile.win
+#
+# Force rebuild from scratch:
+#   make -B -f Makefile.win
+# 
+
+CC = gcc
+AS = $(CC)
+LD = $(CC)
+
+CFLAGS = -O3 -I./asm/i386 -Dmain=SDL_main
+CFLAGS += -Wall -Wextra 
+LDFLAGS = -s -lmingw32 -lSDLmain -lSDL
+ASFLAGS = -x assembler-with-cpp
+
+SYS_DEFS = -DIS_LITTLE_ENDIAN -DALT_PATH_SEP -DUSE_ASM -DGNUBOY_USE_SDL_TIMERS
+#SYS_DEFS += -DGNUBOY_ENABLE_ORIGINAL_SLOW_AND_SAFE_LOADER
+ASM_OBJS = asm/i386/cpu.o asm/i386/lcd.o asm/i386/refresh.o
+#DISABLE_SOUND = true
+ifdef DISABLE_SOUND
+	SYS_DEFS += -DGNUBOY_DISABLE_SDL_SOUND
+	SND_OBJS = sys/dummy/nosound.o
+endif
+
+
+# If SDL lives in a non-default location set here, for example:
+#CFLAGS += -ISDL-1.2.15/include/
+#LDFLAGS += -LSDL-1.2.15/lib/
+
+SYS_OBJS = $(ASM_OBJS) $(SND_OBJS) sys/windows/windows.o sys/windows/resource.o
+SYS_INCS = -I./sys/windows
+
+SDL_OBJS = sys/sdl/sdl.o sys/sdl/keymap.o sys/sdl/SFont.o
+SDL_LIBS = -lSDL
+
+DISABLE_ZLIB = true
+ifdef DISABLE_ZLIB
+	SYS_DEFS += -DGNUBOY_NO_MINIZIP
+else
+	SYS_OBJS += unzip/unzip.o unzip/ioapi.o
+	LDFLAGS  += -lz
+	CFLAGS   += -DUSE_FILE32API
+endif
+
+all: gnuboy
+
+include Rules
+
+%.o: %.rc
+	windres -o $@ $<
+
+gnuboy: $(OBJS) $(SYS_OBJS) $(SDL_OBJS)
+	$(LD) $(LDFLAGS) $(OBJS) $(SYS_OBJS) $(SDL_OBJS) -o $@ $(SDL_LIBS)
+
+clean:
+	rm -f gnuboy.exe *.o sys/*.o sys/*/*.o asm/*/*.o

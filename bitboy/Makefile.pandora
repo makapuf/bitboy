@@ -1,0 +1,40 @@
+# Makefile for Pandora http://www.openpandora.org/
+# NOTE has some hard coded paths that need editing
+#
+
+CC = arm-none-linux-gnueabi-gcc
+LD = $(CC)
+AS = $(CC)
+
+CFLAGS =  -ansi -pedantic -Wall -Wno-implicit -Wno-long-long -O3 -fstrength-reduce -fthread-jumps  -fcse-follow-jumps -fcse-skip-blocks -frerun-cse-after-loop  -fexpensive-optimizations -fforce-addr -fomit-frame-pointer
+LDFLAGS = $(CFLAGS) -Wl,-rpath -Wl,/home/michi/pandora-dev/arm-2009q3/usr/lib -L/home/michi/pandora-dev/arm-2009q3/usr/lib -L/home/michi/pandora-dev/arm-2009q3/arm-none-linux-gnueabi/libc/lib -L/home/michi/pandora-dev/arm-2009q3/arm-none-linux-gnueabi/libc/usr/lib -L/home/michi/pandora-dev/arm-2009q3/usr/lib -s
+ASFLAGS = $(CFLAGS)
+
+TARGETS =  sdlgnuboy
+
+ASM_OBJS = 
+
+SYS_DEFS = -DHAVE_CONFIG_H -DIS_LITTLE_ENDIAN  -DIS_LINUX
+SYS_OBJS = sys/nix/nix.o $(ASM_OBJS)
+SYS_INCS = -I/home/michi/pandora-dev/arm-2009q3/usr/include -I./sys/nix
+
+SDL_OBJS = sys/sdl/sdl.o sys/sdl/keymap.o
+SDL_LIBS = -L/home/michi/pandora-dev/arm-2009q3/usr/lib -lSDL
+SDL_CFLAGS = -I/home/michi/pandora-dev/arm-2009q3/usr/include/SDL -D_GNU_SOURCE=1 -D_REENTRANT
+
+
+all: $(TARGETS)
+
+include Rules
+
+sdlgnuboy: $(OBJS) $(SYS_OBJS) $(SDL_OBJS)
+	$(LD) $(LDFLAGS) $(OBJS) $(SYS_OBJS) $(SDL_OBJS) -o $@ $(SDL_LIBS)
+
+sys/sdl/sdl.o: sys/sdl/sdl.c
+	$(MYCC) $(SDL_CFLAGS) -c $< -o $@
+
+sys/sdl/keymap.o: sys/sdl/keymap.c
+	$(MYCC) $(SDL_CFLAGS) -c $< -o $@
+
+clean:
+	rm -f *gnuboy gmon.out *.o sys/*.o sys/*/*.o asm/*/*.o

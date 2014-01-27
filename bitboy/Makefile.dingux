@@ -1,0 +1,70 @@
+# Dingoo Open Dingux SDK - clach04
+#
+# NOTE! Requires DINGUX_SDK environment variable to be set to Open Dingux
+#       location (typically this is "/opt/opendingux-toolchain").
+
+# TODO STRIP
+
+EXE_PREFIX = mipsel-linux-
+CC        = ${EXE_PREFIX}gcc
+
+AS = $(CC)
+LD = $(CC)
+
+OPTIMISE   = -O3 -ffast-math -fstrict-aliasing -fomit-frame-pointer -ftree-vectorize -funroll-all-loops -fpeel-loops -ftracer -funswitch-loops -finline-functions -G 0 -march=mips32 -mtune=r4600 -mno-mips16 -msoft-float
+#-fprofile-generate
+#-fprofile-use
+
+DEFAULT_CFLAGS = -Wall `${DINGUX_SDK}/usr/bin/sdl-config --cflags` -I${DINGUX_SDK}/usr/include/
+DEFAULT_LDFLAGS = `${DINGUX_SDK}/usr/bin/sdl-config --libs`
+
+SYS_DEFS = -DIS_LITTLE_ENDIAN
+#-DIS_LINUX
+
+CC_OPTS  = -DGNUBOY_USE_BINARY_RTC_FILES -DGNUBOY_DISABLE_DEBUG_DISASSEMBLE
+CC_OPTS +=-DGNUBOY_USE_SDL_TIMERS
+
+CFLAGS = $(DEFAULT_CFLAGS) $(SYS_DEFS) $(OPTIMISE) $(CC_OPTS)
+#-DUSE_SDL_AUDIO
+LDFLAGS = $(DEFAULT_LDFLAGS) -s -lz -lSDL -lpthread
+# -lgcov
+
+ASM_OBJS =
+
+#DISABLE_SOUND = true
+ifdef DISABLE_SOUND
+	CC_OPTS += -DGNUBOY_DISABLE_SDL_SOUND
+	SND_OBJS = sys/dummy/nosound.o
+endif
+
+SYS_OBJS = $(ASM_OBJS) $(SND_OBJS) sys/dingoo/a320.o sys/dingoo/main.o
+#SYS_OBJS = $(ASM_OBJS) $(SND_OBJS) sys/dingoo/a320.o sys/dingoo/main.o
+#SYS_INCS = -I./sys/nix
+
+SDL_OBJS = sys/sdl/sdl.o sys/sdl/keymap.o sys/sdl/SFont.o 
+SDL_LIBS = 
+
+
+## Requirements for (optional) .zip support
+## Disable with GNUBOY_USE_MINIZIP defined
+SDL_OBJS    += unzip/unzip.o unzip/ioapi.o
+#LIBS    += -lz
+CC_OPTS += -DUSE_FILE32API
+
+
+OBJS   = lcd.o refresh.o lcdc.o palette.o cpu.o mem.o rtc.o hw.o sound.o
+OBJS  += events.o keytable.o loader.o save.o debug.o emu.o
+OBJS  += rccmds.o rckeys.o rcvars.o rcfile.o exports.o split.o inflate.o
+
+TARGET = gnuboy_dingux.dge
+
+all: $(TARGET)
+
+DO_NOT_USE_MAIN = True
+include Rules
+
+$(TARGET): $(OBJS) $(SYS_OBJS) $(SDL_OBJS)
+	$(LD) $(LDFLAGS) $(OBJS) $(SYS_OBJS) $(SDL_OBJS) -o $@ $(SDL_LIBS)
+
+clean:
+	rm -f $(TARGET) *.o sys/*.o unzip/*.o sys/*/*.o sys/*/*/*.o asm/*/*.o

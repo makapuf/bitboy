@@ -1,0 +1,37 @@
+
+include Version
+
+OBJS = lcd_b.o refresh.o lcdc.o cpu.o mem.o rtc.o hw.o sound.o \
+	events.o keytable.o palette.o \
+	loader.o save.o debug.o emu.o \
+	rccmds.o rckeys.o rcvars.o rcfile.o exports.o \
+	split.o path.o inflate.o
+
+
+ifndef DO_NOT_USE_MAIN
+	OBJS += main.o
+endif
+
+
+INCS = -I.
+
+MYCC = $(CC) $(CFLAGS) $(INCS) $(SYS_INCS) $(SYS_DEFS)
+MYAS = $(AS) $(ASFLAGS) $(INCS) $(SYS_INCS) $(SYS_DEFS)
+
+main.o: Version
+
+.c.o:
+	$(MYCC) -c $< -o $@
+
+.s.o:
+	$(MYAS) -c $< -o $@
+
+
+
+
+
+
+
+
+
+
