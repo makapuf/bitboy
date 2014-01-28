@@ -17,3 +17,6 @@
 *.out
 *.app
 bitboy/roms/*
+bitboy/bitboy.bin
+bitboy/bitboy.elf
+bitboy/bitboy_emu
