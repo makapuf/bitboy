@@ -16,7 +16,9 @@
 *.exe
 *.out
 *.app
-bitboy/roms/*
-bitboy/bitboy.bin
-bitboy/bitboy.elf
-bitboy/bitboy_emu
+roms/*
+src/bitboy.bin
+src/bitboy.elf
+src/bitboy_emu
+src/build/*
+
