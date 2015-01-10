@@ -9,6 +9,8 @@
 #include "rtc.h"
 #include "rc.h"
 
+#include "bitbox.h"
+
 /*
 static int framelen = 16743;
 static int framecount;
@@ -33,6 +35,8 @@ void game_init()
 int emu_started=0;
 void game_frame()
 {
+	kbd_emulate_gamepad();
+
 	if (emu_started) {
 		emu_frame();
 	} 
@@ -42,8 +46,9 @@ void game_frame()
 		if (menu_done) emu_init(menu_choice);
 	}
 }
+void graph_frame(void) {}
 
-void game_line()
+void graph_line()
 {
 	if (emu_started) emu_line();
 	else menu_line();

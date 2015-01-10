@@ -17,6 +17,8 @@ GAME_C_OPTS += -DBITBOY_FIXEDRAM=4 -DBITBOY_NOCGB -DIS_LITTLE_ENDIAN
 GAME_C_OPTS += -Wno-unused-variable -Wno-unused-function
 GAME_C_OPTS += -DNOTITLE
 
+NO_SDCARD= 1
+
 # standard makefile
 include lib/bitbox.mk
 

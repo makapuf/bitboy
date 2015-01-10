@@ -156,7 +156,7 @@ void pcm_init()
 	memset(pcm.buf, 0, pcm.len);
 	// now start bitbox audio
 	// audio_init(); // already initialized ?
-	audio_on = 1;
+	// audio_on = 1;
 }
 
 int pcm_submit() // time sync also done here from the buffer which MUST be one frame long.
