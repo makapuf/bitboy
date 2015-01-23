@@ -24,7 +24,6 @@ include lib/bitbox.mk
 
 
 
-
 # package roms in c file, parsing name, size & other characteristics to populate menu
 roms.c: ../roms
 	python ../scripts/mk_rom.py ../roms/* > roms.c 
