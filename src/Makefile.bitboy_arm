@@ -18,7 +18,7 @@ GAME_C_OPTS += -Wno-unused-variable -Wno-unused-function
 GAME_C_OPTS += -DNOTITLE
 
 # standard makefile
-include $(BITBOX)/lib/bitbox.mk
+include $(BITBOX)/kernel/bitbox.mk
 
 
 

@@ -35,8 +35,6 @@ void game_init()
 int emu_started=0;
 void game_frame()
 {
-	kbd_emulate_gamepad();
-
 	if (emu_started) {
 		emu_frame();
 	} 
