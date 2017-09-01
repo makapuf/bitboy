@@ -1,46 +1,16 @@
 TODO
 
-BUG : sram should not start on VGA buffers (ecrase par le memset ds line)--> force buffer on sram segments ?  LD script
-	http://gcc.gnu.org/onlinedocs/gcc/Variable-Attributes.html (force section)
-
-
-X port to kernel, run as emu
-x embed in mem
-X load rom
-X sound
-X ARM compile 
-compile emulator normally / get rid of many warnings
-newsound 
-
-// only one vbank ? gain 8k RAM ... (struct lcd)
+put menu as real GB screen (w/ palette)
+borders ?
 
 custom palette FILTER
 custom palette INGAME
 custom palette USERSEL (button ?)
 
-simu/kernel *2 ? (set hres)
-couper un peu (bcp) des tilemaps
-separate ROM data & ROM header
-
-Load ROM to RAM / Save RAM
-
-test on bitbox !
 fixes glitches bw 
-KO if load mario ? (scroll right ..)
-save sram to flash (rle coded) (quick save/load - 1 seul)
-custom zip pages (vire derniers elements)
+save sram to drive
 
-multiload / load from SD to RAM
-load from sd
+multiload / load from SD + cache
 save sram to SD ?
-save sram compressed (gzip)
-
+emu screenshots ? 
 cheats
-super2x
-real in-kernel (frame & line)
-
-N roms : liste des roms locales (garder 2 ou 32k pour saves) ou sd
-24 32k roms!
-+headers (nom)
-
-color
