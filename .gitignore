@@ -5,6 +5,8 @@
 # Libraries
 *.lib
 *.a
+*.elf 
+*.bin
 
 # Shared objects (inc. Windows DLLs)
 *.dll
@@ -17,8 +19,8 @@
 *.out
 *.app
 roms/*
-src/bitboy.bin
-src/bitboy.elf
-src/bitboy_emu
-src/build/*
+bitboy.bin
+bitboy.elf
+bitboy_emu
+build/
 

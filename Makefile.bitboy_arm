@@ -23,12 +23,12 @@ include $(BITBOX)/kernel/bitbox.mk
 
 
 # package roms in c file, parsing name, size & other characteristics to populate menu
-roms.c: ../roms
-	python ../scripts/mk_rom.py ../roms/* > roms.c 
+roms.c: roms/
+	python scripts/mk_rom.py roms/* > roms.c 
 
 # menu tilemap from tiled files
 tilemaps.c: *.tmx 
-	python ../scripts/mk_tilemaps.py tilemaps $<
+	python scripts/mk_tilemaps.py tilemaps $<
 
 # roms to include in th .bin Do not redistribute if not freeware !
 clean:: 
