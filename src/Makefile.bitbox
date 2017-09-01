@@ -20,6 +20,8 @@ CFLAGS += -DNO_NOISE15
 # also used in Rules
 CFLAGS += -DNO_PALETTE
 
+CFLAGS += -DBITBOY_NOCGB
+
 # gcc 4.x configure tends to default to '-ansi -pedantic'
 # avoid warnings related to strdup()
 CFLAGS += -D_XOPEN_SOURCE=500 -std=c99
@@ -40,7 +42,8 @@ CFLAGS += -DGNUBOY_DISABLE_DEBUG_DISASSEMBLE
 
 SDL_OBJS = sys/bitbox/bitbox.o 
 SDL_LIBS = -L/usr/lib/x86_64-linux-gnu -lSDL
-SDL_CFLAGS = -I/usr/include/SDL -D_GNU_SOURCE=1 -D_REENTRANT
+SDL_CFLAGS = -I/usr/include/SDL -D_GNU_SOURCE=1 
+#-D_REENTRANT
 
 
 all: $(TARGETS)

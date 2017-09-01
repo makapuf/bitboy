@@ -302,11 +302,16 @@ byte ioreg_read(byte r)
  * and a byte value written to the address.
  */
 
+// DEBUG
+#define NB_ROM_CACHES 5
+int nb_romloads=0;
+char cache_rombanks[NB_ROM_CACHES]; // if 4 roms in memory
+
 void mbc_write(int a, byte b)
 {
 	byte ha = (a>>12);
 
-	/* printf("mbc %d: rom bank %02X -[%04X:%02X]-> ", mbc.type, mbc.rombank, a, b); */
+	// printf("mbc %d: rom bank %02X -[%04X:%02X]-> ", mbc.type, mbc.rombank, a, b); 
 	switch (mbc.type)
 	{
 	case MBC_MBC1:
@@ -437,7 +442,13 @@ void mbc_write(int a, byte b)
 		}
 		break;
 	}
-	/* printf("%02X\n", mbc.rombank); */
+
+	// stats : look if cached
+	if (cache_rombanks[mbc.rombank%NB_ROM_CACHES] != mbc.rombank) {
+		cache_rombanks[mbc.rombank%NB_ROM_CACHES] = mbc.rombank;
+		nb_romloads ++;
+	}
+
 	mem_updatemap();
 }
 

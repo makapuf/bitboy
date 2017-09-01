@@ -314,6 +314,11 @@ int bitbox_rom_load(int rom_id)
 	mbc.rombank = 1;
 	mbc.rambank = 0;
 
+	// debug
+	message("loaded ROM , mapper type : %X romsize %d ramsize %d rombank = %d rambank = %d\n", 
+		mbc.type, 
+		mbc.romsize, mbc.ramsize, 
+		mbc.rombank, mbc.rambank);
 
 	// set custom dmg palette
 	// XXX what about 4th palette ?
