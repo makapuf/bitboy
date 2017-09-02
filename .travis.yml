@@ -1,0 +1,21 @@
+language: c 
+sudo: false
+dist: trusty
+addons:
+  apt:
+    packages:
+    - gcc-arm-none-eabi 
+    - libnewlib-arm-none-eabi
+    - libnewlib-dev
+    - libsdl1.2-dev
+    - 
+install: 
+  # check it worked  
+  - arm-none-eabi-gcc --version 
+  - pip install Pillow
+
+script:
+  - "make 
+
+env:
+  - BITBOX=$TRAVIS_BUILD_DIR
