@@ -1,6 +1,8 @@
-language: c 
 sudo: false
 dist: trusty
+
+language: c 
+
 addons:
   apt:
     packages:
@@ -8,14 +10,17 @@ addons:
     - libnewlib-arm-none-eabi
     - libnewlib-dev
     - libsdl1.2-dev
-    - 
-install: 
-  # check it worked  
-  - arm-none-eabi-gcc --version 
+
+install:
+  - git clone https://github.com/makapuf/bitbox.git 
   - pip install Pillow
 
+  # check it worked
+  - arm-none-eabi-gcc --version 
+  - gcc --version
+
 script:
-  - "make 
+  - "make && make test"
 
 env:
-  - BITBOX=$TRAVIS_BUILD_DIR
+  - BITBOX=$TRAVIS_BUILD_DIR/bitbox
